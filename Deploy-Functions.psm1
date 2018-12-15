@@ -1,10 +1,5 @@
-# Implement your module commands in this script.
-
-
-# Export only the functions using PowerShell standard verb-noun naming.
-# Be sure to list each exported functions in the FunctionsToExport field of the module manifest file.
-# This improves performance of command discovery in PowerShell.
-Export-ModuleMember -Function *-*
+Set-StrictMode -Version latest
+$ErrorActionPreference = "Stop"
 
 function New-AzureResourceGroup
 (
@@ -16,12 +11,41 @@ function New-AzureResourceGroup
 
     if (!$resourceGroup)
     {
-        New-AzureRmResourceGroup `
-            -Name $name `
-            -Location $location
+        $null = `
+            New-AzureRmResourceGroup `
+                -Name $name `
+                -Location $location
+        Write-Output  "'$name' Resource Group located in '$location' has been created"
     }
     else
     {
         Write-Warning "'$name' Resource Group located in '$location' already exists"
     }
+}
+
+function Remove-AzureResourceGroup
+(
+    [Parameter(Mandatory=$true)][string]$name,
+    [Parameter(Mandatory=$true)][string]$location
+)
+{
+    $resourceGroup = (Get-AzureRmResourceGroup -Name $Name -Location $Location -ErrorAction Ignore)
+
+    if ($resourceGroup)
+    {
+        Write-Output  "Removing '$name' Resource Group located in '$location'"
+        $null = Remove-AzureRmResourceGroup -Name $name -Force
+        Write-Output  "'$name' Resource Group located in '$location' has been removed"
+    }
+    else
+    {
+        Write-Warning "'$name' Resource Group located in '$location' does not exist"
+    }
+}
+
+function Test-UserLoggedOn()
+{
+    $resourceManagerContext = Get-AzureRmContext
+
+    return $null -ne $resourceManagerContext
 }
