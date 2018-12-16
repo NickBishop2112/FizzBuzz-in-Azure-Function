@@ -3,16 +3,35 @@ $ErrorActionPreference = "Stop"
 
 Import-Module -Name  ".\Deploy-Functions.psm1" -Force
 
-if (-not (Test-UserLoggedOn))
+$resourceGroup = 'haskellFunctions-dev-rg'
+$keyVault = 'haskellFunctions-kv'
+$location = (Get-AzureRmLocation | ? {$_.location.StartsWith('uk')} | select-object -first 1).DisplayName
+
+
+if (Test-UserLoggedOn)
 {
-    Write-Warning 'Log on to Azure'
+    Write-Output 'Already logged in'
+}
+else
+{
+    Write-Output 'Log on to Azure'
     Connect-AzureRmAccount
 }
 
 New-AzureResourceGroup `
-    -name 'Haskell-Functions' `
-    -location 'West Europe'
+    -name $resourceGroup `
+    -location $location
+
+New-AzureKeyVault `
+    -name $keyVault `
+    -resourceGroupName $resourceGroup `
+    -location $location
+
+Remove-AzureKeyVault `
+    -name $keyVault `
+    -resourceGroupName $resourceGroup `
+    -location $location
 
 Remove-AzureResourceGroup `
-    -name 'Haskell-Functions' `
-    -location 'West Europe'
+    -name $resourceGroup `
+    -location $location
