@@ -5,8 +5,9 @@ Import-Module -Name  ".\Deploy-Functions.psm1" -Force
 
 $resourceGroup = 'haskellFunctions-dev-rg'
 $keyVault = 'haskellFunctions-kv'
-$location = (Get-AzureRmLocation | ? {$_.location.StartsWith('uk')} | select-object -first 1).DisplayName
 
+New-SelfSignedCertificateForDevelopment -dnsName 'haskkellfunctions'
+exit
 
 if (Test-UserLoggedOn)
 {
@@ -17,6 +18,8 @@ else
     Write-Output 'Log on to Azure'
     Connect-AzureRmAccount
 }
+
+$location = (Get-AzureRmLocation | Where-Object {$_.location.StartsWith('uk')} | select-object -first 1).DisplayName
 
 New-AzureResourceGroup `
     -name $resourceGroup `

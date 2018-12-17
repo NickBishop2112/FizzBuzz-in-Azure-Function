@@ -68,6 +68,36 @@ function New-AzureKeyVault
     }
 }
 
+function New-SelfSignedCertificateForDevelopment
+(
+    [Parameter(Mandatory=$true)][string]$dnsName
+)
+{
+    $filePath = "$PSScriptRoot\$dnsName.pfx"
+
+    $certificate =
+        New-SelfSignedCertificate `
+            -DnsName $DnsName `
+            -CertStoreLocation Cert:\CurrentUser\My `
+            -KeySpec KeyExchange
+
+    $generatedPassword = [System.Web.Security.Membership]::GeneratePassword(20,5)
+
+    $null =
+        Export-PfxCertificate `
+            -Cert (Get-ChildItem -Path "cert:\CurrentUser\My\$($certificate.Thumbprint)") `
+            -FilePath $filePath `
+            -Password (ConvertTo-SecureString $generatedPassword -AsPlainText -Force)
+
+    [hashtable]$return = @{}
+    $return.ThumbPrint = $certificate.Thumbprint
+    $return.GeneratedPassword = $generatedPassword
+    $return.FilePath = $filePath
+
+    Write-Output ('Created self-signed certificate, thumbprint = ''{0}'', Password = ''{1}'', path = ''{2}''' -f $return.Thumbprint, $return.GeneratedPassword, $return.FilePath)
+    return $return
+}
+
 function Remove-AzureKeyVault
 (
     [Parameter(Mandatory=$true)][string]$name,
