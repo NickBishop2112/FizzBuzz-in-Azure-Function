@@ -27,8 +27,12 @@ New-AzureKeyVault `
     -resourceGroupName $resourceGroup `
     -location $location
 
-New-SelfSignedCertificateForDevelopment -domainNameServiceName 'haskkellfunctions'
-Import-AzureKeyVaultIfCertificateExists -KeyVaultName $keyVault
+New-SelfSignedCertificateForDevelopment `
+    -domainNameServiceName 'haskkellfunctions'
+
+Import-AzureKeyVaultIfCertificateExists `
+    -KeyVaultName $keyVault `
+    -domainNameServiceName 'haskkellfunctions'
 
 Remove-AzureKeyVault `
     -name $keyVault `

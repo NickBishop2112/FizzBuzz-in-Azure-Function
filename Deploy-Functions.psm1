@@ -125,17 +125,17 @@ function Test-UserLoggedOn()
     return $null -ne (Get-AzureRmContext).Account
 }
 
-function Import-AzureKeyVaultCertificate
+function Import-AzureKeyVaultIfCertificateExists
 (
     [Parameter(Mandatory=$true)][string]$KeyVaultName,
-    [Parameter(Mandatory=$true)][string]$certificateName
+    [Parameter(Mandatory=$true)][string]$domainNameServiceName
 )
 {
-    $certificate = get-childitem -path Cert:\LocalMachine\My -dnsname $domainNameServiceName
+    $localCertificate = get-childitem -path Cert:\LocalMachine\My -dnsname $domainNameServiceName
 
-    if($null -eq $certificate)
+    if($null -eq $localCertificate)
     {
-        throw "Could not find '$certificate' certificate in LocalMachine Store"
+        throw "Could not find '$localCertificate' certificate in LocalMachine Store"
     }
 
     $fileName = New-TemporaryFile
@@ -143,14 +143,27 @@ function Import-AzureKeyVaultCertificate
     $password = [System.Web.Security.Membership]::GeneratePassword(30,10)
     $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
 
-    Export-PfxCertificate `
-        -Cert (Get-ChildItem -Path "cert:\LocalMachine\My\$($certificate.Thumbprint)") `
-        -FilePath $fileName `
-        -Password $securePassword
+    $azureCertificate = Get-AzureKeyVaultCertificate -VaultName $KeyVaultName -Name $domainNameServiceName -ErrorAction SilentlyContinue
 
-    Import-AzureKeyVaultCertificate `
-        -VaultName $KeyVaultName `
-        -Name $CertificateName `
-        -FilePath $localPath `
-        -Password $securePassword
+    if ($null -eq $azureCertificate)
+    {
+        $null =
+            Export-PfxCertificate `
+                -Cert (Get-ChildItem -Path "cert:\LocalMachine\My\$($localCertificate.Thumbprint)") `
+                -FilePath $fileName `
+                -Password $securePassword
+
+        $null =
+            Import-AzureKeyVaultCertificate `
+                -VaultName $KeyVaultName `
+                -Name $domainNameServiceName `
+                -FilePath $fileName `
+                -Password $securePassword
+
+        Write-Output "Imported Certificate '$domainNameServiceName' into the '$KeyVaultName' Key Vault"
+    }
+    else
+    {
+        Write-Warning "Certificate '$domainNameServiceName' into the '$KeyVaultName' Key Vault has already been imported"
+    }
 }
