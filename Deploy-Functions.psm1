@@ -139,7 +139,7 @@ function Import-AzureKeyVaultIfCertificateExists
     }
 
     $fileName = New-TemporaryFile
-
+y
     $password = [System.Web.Security.Membership]::GeneratePassword(30,10)
     $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
 
@@ -164,6 +164,6 @@ function Import-AzureKeyVaultIfCertificateExists
     }
     else
     {
-        Write-Warning "Certificate '$domainNameServiceName' into the '$KeyVaultName' Key Vault has already been imported"
+        Write-Warning "Certificate '$domainNameServiceName' in the '$KeyVaultName' Key Vault has already been imported"
     }
 }
