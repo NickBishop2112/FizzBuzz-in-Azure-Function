@@ -67,35 +67,30 @@ function New-AzureKeyVault
         Write-Warning  "'$name' Key Vault in '$resourceGroupName' Resource Group located in '$location' already exists"
     }
 }
-
+# Domain Name System
 function New-SelfSignedCertificateForDevelopment
 (
-    [Parameter(Mandatory=$true)][string]$dnsName
+    [Parameter(Mandatory=$true)][string]$domainNameServiceName
 )
 {
-    $filePath = "$PSScriptRoot\$dnsName.pfx"
+    $certificate = get-childitem -path Cert:\LocalMachine\My -dnsname $domainNameServiceName
 
-    $certificate =
-        New-SelfSignedCertificate `
-            -DnsName $DnsName `
-            -CertStoreLocation Cert:\CurrentUser\My `
-            -KeySpec KeyExchange
+    if ($null -eq $certificate)
+    {
+        $certificate =
+            New-SelfSignedCertificate `
+                -DnsName $domainNameServiceName `
+                -CertStoreLocation Cert:\LocalMachine\My `
+                -KeySpec KeyExchange
 
-    $generatedPassword = [System.Web.Security.Membership]::GeneratePassword(20,5)
+        Write-Output "Created certificate in LocalMatchine store with DNS Name of '$domainNameServiceName', and Thumbprint '$($certificate.Thumbprint)'"
+    }
+    else
+    {
+        Write-Warning "Certificate in LocalMatchine store with DNS Name of '$domainNameServiceName', and Thumbprint '$($certificate.Thumbprint)' already exists"
+    }
 
-    $null =
-        Export-PfxCertificate `
-            -Cert (Get-ChildItem -Path "cert:\CurrentUser\My\$($certificate.Thumbprint)") `
-            -FilePath $filePath `
-            -Password (ConvertTo-SecureString $generatedPassword -AsPlainText -Force)
-
-    [hashtable]$return = @{}
-    $return.ThumbPrint = $certificate.Thumbprint
-    $return.GeneratedPassword = $generatedPassword
-    $return.FilePath = $filePath
-
-    Write-Output ('Created self-signed certificate, thumbprint = ''{0}'', Password = ''{1}'', path = ''{2}''' -f $return.Thumbprint, $return.GeneratedPassword, $return.FilePath)
-    return $return
+    return $certificate.Thumbprint
 }
 
 function Remove-AzureKeyVault
@@ -128,4 +123,34 @@ function Remove-AzureKeyVault
 function Test-UserLoggedOn()
 {
     return $null -ne (Get-AzureRmContext).Account
+}
+
+function Import-AzureKeyVaultCertificate
+(
+    [Parameter(Mandatory=$true)][string]$KeyVaultName,
+    [Parameter(Mandatory=$true)][string]$certificateName
+)
+{
+    $certificate = get-childitem -path Cert:\LocalMachine\My -dnsname $domainNameServiceName
+
+    if($null -eq $certificate)
+    {
+        throw "Could not find '$certificate' certificate in LocalMachine Store"
+    }
+
+    $fileName = New-TemporaryFile
+
+    $password = [System.Web.Security.Membership]::GeneratePassword(30,10)
+    $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+
+    Export-PfxCertificate `
+        -Cert (Get-ChildItem -Path "cert:\LocalMachine\My\$($certificate.Thumbprint)") `
+        -FilePath $fileName `
+        -Password $securePassword
+
+    Import-AzureKeyVaultCertificate `
+        -VaultName $KeyVaultName `
+        -Name $CertificateName `
+        -FilePath $localPath `
+        -Password $securePassword
 }

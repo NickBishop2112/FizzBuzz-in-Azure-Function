@@ -6,9 +6,6 @@ Import-Module -Name  ".\Deploy-Functions.psm1" -Force
 $resourceGroup = 'haskellFunctions-dev-rg'
 $keyVault = 'haskellFunctions-kv'
 
-New-SelfSignedCertificateForDevelopment -dnsName 'haskkellfunctions'
-exit
-
 if (Test-UserLoggedOn)
 {
     Write-Output 'Already logged in'
@@ -29,6 +26,9 @@ New-AzureKeyVault `
     -name $keyVault `
     -resourceGroupName $resourceGroup `
     -location $location
+
+New-SelfSignedCertificateForDevelopment -domainNameServiceName 'haskkellfunctions'
+Import-AzureKeyVaultIfCertificateExists -KeyVaultName $keyVault
 
 Remove-AzureKeyVault `
     -name $keyVault `
