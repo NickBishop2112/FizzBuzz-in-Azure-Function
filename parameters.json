@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "value": "HaskellFunctionsApplication"
+        },
+        "storageName": {
+            "value": "haskellfunctionb223"
+        },
+        "location": {
+            "value": "Central US"
+        },
+        "subscriptionId": {
+            "value": "2fb16c51-24b7-4e92-8e4a-8b84a98fe0ef"
+        }
+    }
+}

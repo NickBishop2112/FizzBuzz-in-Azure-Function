@@ -139,7 +139,7 @@ function Import-AzureKeyVaultIfCertificateExists
     }
 
     $fileName = New-TemporaryFile
-y
+
     $password = [System.Web.Security.Membership]::GeneratePassword(30,10)
     $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
 
@@ -166,4 +166,46 @@ y
     {
         Write-Warning "Certificate '$domainNameServiceName' in the '$KeyVaultName' Key Vault has already been imported"
     }
+}
+
+function New-Application
+(
+    [Parameter(Mandatory=$true)][string]$resourceGroupName,
+    [Parameter(Mandatory=$true)][string]$KeyVaultName,
+    [Parameter(Mandatory=$true)][string]$location,
+    [Parameter(Mandatory=$true)][string]$domainNameServiceName
+)
+{
+    New-AzureResourceGroup `
+        -name $resourceGroup `
+        -location $location
+
+    New-AzureKeyVault `
+        -name $keyVault `
+        -resourceGroupName $resourceGroup `
+        -location $location
+
+    New-SelfSignedCertificateForDevelopment `
+        -domainNameServiceName $domainNameServiceName
+
+    Import-AzureKeyVaultIfCertificateExists `
+        -KeyVaultName $keyVault `
+        -domainNameServiceName $domainNameServiceName
+}
+
+function Remove-Application
+(
+    [Parameter(Mandatory=$true)][string]$resourceGroupName,
+    [Parameter(Mandatory=$true)][string]$KeyVaultName,
+    [Parameter(Mandatory=$true)][string]$location
+)
+{
+    Remove-AzureKeyVault `
+        -name $keyVaultName `
+        -resourceGroupName $resourceGroup `
+        -location $location
+
+    Remove-AzureResourceGroup `
+        -name $resourceGroup `
+        -location $location
 }

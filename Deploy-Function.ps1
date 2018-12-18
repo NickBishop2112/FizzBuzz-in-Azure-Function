@@ -3,8 +3,9 @@ $ErrorActionPreference = "Stop"
 
 Import-Module -Name  ".\Deploy-Functions.psm1" -Force
 
-$resourceGroup = 'haskellFunctions-dev-rg'
-$keyVault = 'haskellFunctions-kv'
+$script:resourceGroup = 'haskellFunctions-dev-rg'
+$script:keyVault = 'haskellFunctions-kv'
+$script:domainNameServiceName = 'haskkellfunctions'
 
 if (Test-UserLoggedOn)
 {
@@ -16,29 +17,16 @@ else
     Connect-AzureRmAccount
 }
 
-$location = (Get-AzureRmLocation | Where-Object {$_.location.StartsWith('uk')} | select-object -first 1).DisplayName
+$script:location = (Get-AzureRmLocation | Where-Object {$_.location.StartsWith('uk')} | select-object -first 1).DisplayName
 
-New-AzureResourceGroup `
-    -name $resourceGroup `
-    -location $location
+new-application `
+    -resourceGroup $script:resourceGroup `
+    -keyVault $script:keyVault `
+    -location $script:location `
+    -domainNameServiceName $script:domainNameServiceName
 
-New-AzureKeyVault `
-    -name $keyVault `
-    -resourceGroupName $resourceGroup `
-    -location $location
+exit
 
-New-SelfSignedCertificateForDevelopment `
-    -domainNameServiceName 'haskkellfunctions'
-
-Import-AzureKeyVaultIfCertificateExists `
-    -KeyVaultName $keyVault `
-    -domainNameServiceName 'haskkellfunctions'
-
-Remove-AzureKeyVault `
-    -name $keyVault `
-    -resourceGroupName $resourceGroup `
-    -location $location
-
-Remove-AzureResourceGroup `
-    -name $resourceGroup `
-    -location $location
+remove-application `
+    -resourceGroup $script:resourceGroup `
+    -location $script:location
