@@ -173,7 +173,9 @@ function New-Application
     [Parameter(Mandatory=$true)][string]$resourceGroupName,
     [Parameter(Mandatory=$true)][string]$KeyVaultName,
     [Parameter(Mandatory=$true)][string]$location,
-    [Parameter(Mandatory=$true)][string]$domainNameServiceName
+    [Parameter(Mandatory=$true)][string]$domainNameServiceName,
+    [Parameter(Mandatory=$true)][string]$templateFilePath,
+    [Parameter(Mandatory=$true)][string]$parametersFilePath
 )
 {
     New-AzureResourceGroup `
@@ -191,6 +193,8 @@ function New-Application
     Import-AzureKeyVaultIfCertificateExists `
         -KeyVaultName $keyVault `
         -domainNameServiceName $domainNameServiceName
+
+    New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath
 }
 
 function Remove-Application
