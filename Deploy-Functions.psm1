@@ -67,7 +67,7 @@ function New-AzureKeyVault
         Write-Warning  "'$name' Key Vault in '$resourceGroupName' Resource Group located in '$location' already exists"
     }
 }
-# Domain Name System
+
 function New-SelfSignedCertificateForDevelopment
 (
     [Parameter(Mandatory=$true)][string]$domainNameServiceName
@@ -110,7 +110,7 @@ function Remove-AzureKeyVault
                 -VaultName $name `
                 -resourceGroupName $resourceGroupName `
                 -location $location `
-                -Force -PassThru
+                -Force
 
         Write-Output  "'$name' Key Vault in '$resourceGroupName' Resource Group located in '$location' has been removed"
     }
@@ -123,6 +123,27 @@ function Remove-AzureKeyVault
 function Test-UserLoggedOn()
 {
     return $null -ne (Get-AzureRmContext).Account
+}
+
+function Remove-AzureKeyVaultExistingCertificate
+(
+    [Parameter(Mandatory=$true)][string]$KeyVaultName,
+    [Parameter(Mandatory=$true)][string]$domainNameServiceName
+)
+{
+    $azureCertificate = Get-AzureKeyVaultCertificate -VaultName $KeyVaultName -Name $domainNameServiceName -ErrorAction SilentlyContinue
+
+    if ($null -ne $azureCertificate)
+    {
+        Remove-AzureKeyVaultCertificate `
+            -VaultName $KeyVaultName `
+            -Name $domainNameServiceName
+        Write-Output "Removed '$domainNameServiceName' certificate from the '$KeyVaultName' Key Vault"
+    }
+    else
+    {
+        Write-Warning "'Can not remove the $domainNameServiceName' certificate from the '$KeyVaultName' Key Vault as it does not exist"
+    }
 }
 
 function Import-AzureKeyVaultIfCertificateExists
@@ -147,11 +168,13 @@ function Import-AzureKeyVaultIfCertificateExists
 
     if ($null -eq $azureCertificate)
     {
+        Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+
         $null =
             Export-PfxCertificate `
                 -Cert (Get-ChildItem -Path "cert:\LocalMachine\My\$($localCertificate.Thumbprint)") `
                 -FilePath $fileName `
-                -Password $securePassword
+                -Password $securePassword -Force
 
         $null =
             Import-AzureKeyVaultCertificate `
@@ -191,19 +214,28 @@ function New-Application
         -domainNameServiceName $domainNameServiceName
 
     Import-AzureKeyVaultIfCertificateExists `
-        -KeyVaultName $keyVault `
+        -KeyVaultName $KeyVaultName `
         -domainNameServiceName $domainNameServiceName
 
-    New-AzureRmResourceGroupDeployment -ResourceGroupName $resourceGroup -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath
+    New-AzureRmResourceGroupDeployment `
+         -ResourceGroupName $resourceGroup `
+         -TemplateFile $templateFilePath `
+         -TemplateParameterFile $parametersFilePath `
+         -Mode Complete
 }
 
 function Remove-Application
 (
     [Parameter(Mandatory=$true)][string]$resourceGroupName,
+    [Parameter(Mandatory=$true)][string]$location,
     [Parameter(Mandatory=$true)][string]$KeyVaultName,
-    [Parameter(Mandatory=$true)][string]$location
+    [Parameter(Mandatory=$true)][string]$domainNameServiceName
 )
 {
+    Remove-AzureKeyVaultExistingCertificate  `
+        -KeyVaultName $keyVaultName `
+        -domainNameServiceName $domainNameServiceName
+
     Remove-AzureKeyVault `
         -name $keyVaultName `
         -resourceGroupName $resourceGroup `

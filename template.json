@@ -1,11 +1,11 @@
 {
     "resources": [
         {
-            "apiVersion": "2016-03-01",
-            "name": "[parameters('name')]",
+            "apiVersion": "2014-06-01",
+            "name": "[parameters('functionName')]",
             "type": "Microsoft.Web/sites",
             "properties": {
-                "name": "[parameters('name')]",
+                "name": "[parameters('functionName')]",
                 "siteConfig": {
                     "appSettings": [
                         {
@@ -26,7 +26,7 @@
                         },
                         {
                             "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[concat(toLower(parameters('name')), 'b223')]"
+                            "value": "[concat(toLower(parameters('functionName')), 'b223')]"
                         },
                         {
                             "name": "WEBSITE_NODE_DEFAULT_VERSION",
@@ -54,7 +54,7 @@
         }
     ],
     "parameters": {
-        "name": {
+        "functionName": {
             "type": "string"
         },
         "storageName": {
