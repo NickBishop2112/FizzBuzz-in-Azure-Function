@@ -60,6 +60,7 @@ function New-AzureKeyVault
                 -resourceGroupName $resourceGroupName `
                 -location $location `
                 -EnabledForDeployment
+
         Write-Output  "'$name' Key Vault in '$resourceGroupName' Resource Group located in '$location' has been created"
     }
     else
@@ -137,7 +138,8 @@ function Remove-AzureKeyVaultExistingCertificate
     {
         Remove-AzureKeyVaultCertificate `
             -VaultName $KeyVaultName `
-            -Name $domainNameServiceName
+            -Name $domainNameServiceName `
+            -Force
         Write-Output "Removed '$domainNameServiceName' certificate from the '$KeyVaultName' Key Vault"
     }
     else
@@ -218,10 +220,12 @@ function New-Application
         -domainNameServiceName $domainNameServiceName
 
     New-AzureRmResourceGroupDeployment `
-         -ResourceGroupName $resourceGroup `
-         -TemplateFile $templateFilePath `
-         -TemplateParameterFile $parametersFilePath `
-         -Mode Complete
+        -ResourceGroupName $resourceGroup `
+        -TemplateFile $templateFilePath `
+        -TemplateParameterFile $parametersFilePath `
+        -Mode Complete `
+        -Force `
+        -DeploymentDebugLogLevel All -Verbose
 }
 
 function Remove-Application
