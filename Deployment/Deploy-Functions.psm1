@@ -349,7 +349,7 @@ function New-AzureQueue
 
     if ($null -eq $queue)            
     {
-        New-AzureStorageQueue  `
+        $null = New-AzureStorageQueue  `
             -name $queueName `
             -Context $context `
 
@@ -380,7 +380,7 @@ function Remove-AzureQueue
 
     if ($null -ne $queue)            
     {
-        Remove-AzureStorageQueue `
+        $null = Remove-AzureStorageQueue `
             -name $queueName `
             -Context $context `
             -Force
