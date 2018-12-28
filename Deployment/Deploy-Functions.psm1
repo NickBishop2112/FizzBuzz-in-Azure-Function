@@ -199,6 +199,7 @@ function New-Application
     [Parameter(Mandatory=$true)][string]$KeyVaultName,
     [Parameter(Mandatory=$true)][string]$location,
     [Parameter(Mandatory=$true)][string]$storageAccount,    
+    [Parameter(Mandatory=$true)][string]$queueName,  
     [Parameter(Mandatory=$true)][string]$domainNameServiceName,
     [Parameter(Mandatory=$true)][string]$templateFilePath,
     [Parameter(Mandatory=$true)][string]$parametersFilePath
@@ -225,6 +226,11 @@ function New-Application
         -resourceGroupName $resourceGroup `
         -location $location
 
+    New-AzureQueue `
+        -queueName $queueName `
+        -resourceGroupName $resourceGroupName `
+        -storageAccount $storageAccount
+
     #New-AzureRmResourceGroupDeployment `
     #    -ResourceGroupName $resourceGroup `
     #    -TemplateFile $templateFilePath `
@@ -238,11 +244,17 @@ function Remove-Application
 (
     [Parameter(Mandatory=$true)][string]$resourceGroupName,
     [Parameter(Mandatory=$true)][string]$location,
-    [Parameter(Mandatory=$true)][string]$storageAccount,     
+    [Parameter(Mandatory=$true)][string]$storageAccount, 
+    [Parameter(Mandatory=$true)][string]$queueName,          
     [Parameter(Mandatory=$true)][string]$KeyVaultName,
     [Parameter(Mandatory=$true)][string]$domainNameServiceName
 )
 {
+    Remove-AzureQueue `
+        -queueName $queueName `
+        -resourceGroupName $resourceGroupName `
+        -storageAccount $storageAccount
+
     Remove-AzureStorageAccount `
         -name $storageAccount `
         -resourceGroupName $resourceGroupName
@@ -258,7 +270,7 @@ function Remove-Application
 
     Remove-AzureResourceGroup `
         -name $resourceGroup `
-        -location $location   
+        -location $location     
 }
 
 function New-AzureStorageAccount
@@ -317,3 +329,67 @@ function Remove-AzureStorageAccount
         Write-Warning "Azure Storage Account '$name' in the '$resourceGroupName' located in '$location' does not exist"
     }
 }
+
+function New-AzureQueue
+(
+    [Parameter(Mandatory=$true)][string]$queueName,
+    [Parameter(Mandatory=$true)][string]$resourceGroupName, 
+    [Parameter(Mandatory=$true)][string]$storageAccount
+)
+{
+    $context = `
+        (get-AzureRmStorageAccount `
+            -Name $storageAccount `
+            -ResourceGroupName $resourceGroupName).Context 
+    
+    $queue = Get-AzureStorageQueue `
+            -Context $context `
+            -Name $queueName `
+            -ErrorAction SilentlyContinue
+
+    if ($null -eq $queue)            
+    {
+        New-AzureStorageQueue  `
+            -name $queueName `
+            -Context $context `
+
+        Write-Output "Created the queue '$queueName' on storage account '$storageAccount' for resource group '$resourceGroupName'"
+    }
+    else
+    {
+        Write-Warning "Unable to create the queue '$queueName' on storage account '$storageAccount' for resource group '$resourceGroupName' as it already exists"        
+    }
+}
+
+function Remove-AzureQueue
+(
+    [Parameter(Mandatory=$true)][string]$queueName,
+    [Parameter(Mandatory=$true)][string]$resourceGroupName, 
+    [Parameter(Mandatory=$true)][string]$storageAccount
+)
+{
+    $context = `
+        (get-AzureRmStorageAccount `
+            -Name $storageAccount `
+            -ResourceGroupName $resourceGroupName).Context 
+    
+    $queue = Get-AzureStorageQueue `
+            -Context $context `
+            -Name $queueName `
+            -ErrorAction SilentlyContinue
+
+    if ($null -ne $queue)            
+    {
+        Remove-AzureStorageQueue `
+            -name $queueName `
+            -Context $context `
+            -Force
+
+        Write-Output "Removed the queue '$queueName' on storage account '$storageAccount' for resource group '$resourceGroupName'"
+    }
+    else
+    {
+        Write-Warning "Unable to remove the queue '$queueName' on storage account '$storageAccount' for resource group '$resourceGroupName' as it does not exist"        
+    }
+}
+
