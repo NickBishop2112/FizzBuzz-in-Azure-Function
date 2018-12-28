@@ -24,7 +24,7 @@ $script:resourceGroup = 'haskellFunctions-dev-rg'
 $script:keyVault = 'haskellFunctions-kv'
 $script:domainNameServiceName = 'haskkellfunctions'
 $script:location = "UK South"
-
+$script:storageAccount = "storagequeuehaskell"
 if ($new.IsPresent)
 {
     new-application `
@@ -33,7 +33,8 @@ if ($new.IsPresent)
         -location $script:location `
         -domainNameServiceName $script:domainNameServiceName `
         -templateFilePath (join-path -Path $PSScriptRoot -ChildPath 'template.json') `
-        -parametersFilePath (join-path -Path $PSScriptRoot -ChildPath 'parameters.json')
+        -parametersFilePath (join-path -Path $PSScriptRoot -ChildPath 'parameters.json') `
+        -storageAccount $script:storageAccount
 }
 
 if ($remove.IsPresent)
@@ -43,4 +44,5 @@ if ($remove.IsPresent)
         -KeyVaultName $script:keyVault `
         -location $script:location `
         -domainNameServiceName $script:domainNameServiceName `
+        -storageAccount $script:storageAccount
 }

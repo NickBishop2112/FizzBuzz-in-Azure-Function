@@ -7,7 +7,7 @@ function New-AzureResourceGroup
     [Parameter(Mandatory=$true)][string]$location
 )
 {
-    $resourceGroup = (Get-AzureRmResourceGroup -Name $Name -Location $Location -ErrorAction Ignore)
+    $resourceGroup = Get-AzureRmResourceGroup -Name $Name -Location $Location -ErrorAction Ignore
 
     if (!$resourceGroup)
     {
@@ -198,6 +198,7 @@ function New-Application
     [Parameter(Mandatory=$true)][string]$resourceGroupName,
     [Parameter(Mandatory=$true)][string]$KeyVaultName,
     [Parameter(Mandatory=$true)][string]$location,
+    [Parameter(Mandatory=$true)][string]$storageAccount,    
     [Parameter(Mandatory=$true)][string]$domainNameServiceName,
     [Parameter(Mandatory=$true)][string]$templateFilePath,
     [Parameter(Mandatory=$true)][string]$parametersFilePath
@@ -219,23 +220,33 @@ function New-Application
         -KeyVaultName $KeyVaultName `
         -domainNameServiceName $domainNameServiceName
 
-    New-AzureRmResourceGroupDeployment `
-        -ResourceGroupName $resourceGroup `
-        -TemplateFile $templateFilePath `
-        -TemplateParameterFile $parametersFilePath `
-        -Mode Complete `
-        -Force `
-        -DeploymentDebugLogLevel All -Verbose
+    New-AzureStorageAccount `
+        -name $storageAccount `
+        -resourceGroupName $resourceGroup `
+        -location $location
+
+    #New-AzureRmResourceGroupDeployment `
+    #    -ResourceGroupName $resourceGroup `
+    #    -TemplateFile $templateFilePath `
+    #    -TemplateParameterFile $parametersFilePath `
+    #    -Mode Complete `
+    #    -Force `
+    #    -DeploymentDebugLogLevel All -Verbose
 }
 
 function Remove-Application
 (
     [Parameter(Mandatory=$true)][string]$resourceGroupName,
     [Parameter(Mandatory=$true)][string]$location,
+    [Parameter(Mandatory=$true)][string]$storageAccount,     
     [Parameter(Mandatory=$true)][string]$KeyVaultName,
     [Parameter(Mandatory=$true)][string]$domainNameServiceName
 )
 {
+    Remove-AzureStorageAccount `
+        -name $storageAccount `
+        -resourceGroupName $resourceGroupName
+
     Remove-AzureKeyVaultExistingCertificate  `
         -KeyVaultName $keyVaultName `
         -domainNameServiceName $domainNameServiceName
@@ -247,5 +258,62 @@ function Remove-Application
 
     Remove-AzureResourceGroup `
         -name $resourceGroup `
-        -location $location
+        -location $location   
+}
+
+function New-AzureStorageAccount
+(
+    [Parameter(Mandatory=$true)][string]$name,
+    [Parameter(Mandatory=$true)][string]$resourceGroupName,
+    [Parameter(Mandatory=$true)][string]$location
+)
+{
+    $storageAccount = `
+        get-AzureRmStorageAccount `
+            -ResourceGroupName $resourceGroupName `
+            -Name $name `
+            -ErrorAction SilentlyContinue
+
+    if ($null -eq $storageAccount)
+    {
+        $null = New-AzureRmStorageAccount `
+            -ResourceGroupName $resourceGroupName `
+            -AccountName $name `
+            -Location $location `
+            -SkuName Standard_GRS
+
+        Write-Output "Created Azure Storage Account '$name' in the '$resourceGroupName' located in '$location'"
+    }
+    else 
+    {
+        Write-Warning "Azure Storage Account '$name' in the '$resourceGroupName' located in '$location' is already created"
+    }
+}
+
+function Remove-AzureStorageAccount
+(
+    [Parameter(Mandatory=$true)][string]$name,
+    [Parameter(Mandatory=$true)][string]$resourceGroupName   
+)
+{
+    $storageAccount = `
+        get-AzureRmStorageAccount `
+            -ResourceGroupName $resourceGroupName `
+            -Name $name `
+            -ErrorAction SilentlyContinue
+
+
+    if ($null -ne $storageAccount)
+    {
+        $null = Remove-AzureRmStorageAccount `
+            -ResourceGroupName $resourceGroupName `
+            -AccountName $name `
+            -Force       
+
+        Write-Output "Removed Azure Storage Account '$name' in the '$resourceGroupName' located in '$location'"
+    }
+    else 
+    {
+        Write-Warning "Azure Storage Account '$name' in the '$resourceGroupName' located in '$location' does not exist"
+    }
 }
