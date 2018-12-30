@@ -22,53 +22,56 @@ namespace FizzBuzz.Application.Tests
         [TestMethod]
         public void GivenGenerateWhenMultiplesOfThreeThenFizz()
         {
-            string result;
-            FizzBuzzGenerator.Generate("3", out result, this.logger.Object);
+            string result = FizzBuzzGenerator.Generate("3", this.logger.Object);
 
             result.Should().Be("Fizz");
-            this.VerifyLogging("Item '3' is processed");
+            this.VerifyLogging("Item '3' is processed", LogLevel.Information);
         }
 
         [TestMethod]
         public void GivenGenerateWhenMultiplesOfFiveThenBuzz()
         {
-            string result;
-            FizzBuzzGenerator.Generate("5", out result, this.logger.Object);
+            string result = FizzBuzzGenerator.Generate("5", this.logger.Object);
             result.Should().Be("Buzz");
-            this.VerifyLogging("Item '5' is processed");
+            this.VerifyLogging("Item '5' is processed", LogLevel.Information);
         }
 
         [TestMethod]
         public void GivenGenerateWhenMultiplesOfThreeAndFiveThenFizzBuzz()
         {
-            string result;
-            FizzBuzzGenerator.Generate("15", out result, this.logger.Object);
+            string result = FizzBuzzGenerator.Generate("15", this.logger.Object);
             result.Should().Be("FizzBuzz");
-            this.VerifyLogging("Item '15' is processed");
+            this.VerifyLogging("Item '15' is processed", LogLevel.Information);
         }
 
         [TestMethod]
         public void GivenGenerateWhenNeitherMultiplesOfThreeOrFiveThenNoFizzAndOrBuzz()
         {
-            string result;
-            FizzBuzzGenerator.Generate("1", out result, this.logger.Object);
+            string result = FizzBuzzGenerator.Generate("1", this.logger.Object);
             result.Should().Be(string.Empty);
-            this.VerifyLogging("Item '1' is processed");
+            this.VerifyLogging("Item '1' is processed", LogLevel.Information);
         }
 
-        private void VerifyLogging(string message)
+        [TestMethod]
+        public void GivenGenerateWhenInvalidNumberThenHandleException()
+        {
+            Action action = () => FizzBuzzGenerator.Generate("x", this.logger.Object);
+            action.Should().ThrowExactly<InvalidOperationException>().WithMessage("Fizz Buzz input 'x' should be a integer"); 
+            this.VerifyLogging("System.InvalidOperationException: Fizz Buzz input 'x' should be a integer", LogLevel.Error);            
+        }
+
+        private void VerifyLogging(string message, LogLevel logLevel)
         {
             this.logger
                 .Verify(
                     x => 
                         x.Log(
-                            LogLevel.Information, 
+                            logLevel, 
                             It.IsAny<EventId>(), 
-                            It.Is<FormattedLogValues>(y => y[0].Value.ToString() == message), 
-                            null, 
+                            It.Is<FormattedLogValues>(y => y[0].Value.ToString().StartsWith(message, StringComparison.Ordinal)), 
+                            It.IsAny<Exception>(), 
                             It.IsAny<Func<object, Exception, string>>()), 
                     Times.Once);
         }
-
     }
 }

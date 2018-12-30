@@ -2,29 +2,44 @@ namespace FizzBuzz.Application
 {
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Logging;
+    using System;
 
     public static class FizzBuzzGenerator
     {
         [FunctionName("Generate")]
-        public static void Generate(
+        [return: Queue("fizzbuzz-messages-002")]
+        public static string Generate(
             [QueueTrigger("fizzbuzz-messages-001")]string queueItem,
-            [Queue("fizzbuzz-messages-002")] out string result,
             ILogger log)
         {
-            int number = int.Parse(queueItem);
-            result = string.Empty;
-
-            if ((number % 3) == 0)
+            try
             {
-                result += "Fizz";
-            }
+                int number;
+                if (!int.TryParse(queueItem, out number))
+                {
+                    throw new InvalidOperationException($"Fizz Buzz input '{queueItem}' should be a integer");
+                }
 
-            if ((number % 5) == 0)
+                string result = string.Empty;
+
+                if ((number % 3) == 0)
+                {
+                    result += "Fizz";
+                }
+
+                if ((number % 5) == 0)
+                {
+                    result += "Buzz";
+                }
+
+                log.LogInformation($"Item '{number}' is processed");
+                return result;
+            }
+            catch (Exception exception)
             {
-                result += "Buzz";
+                log.LogError(exception.ToString());
+                throw;
             }
-
-            log.LogInformation($"Item '{number}' is processed");            
         }
     }
 }
