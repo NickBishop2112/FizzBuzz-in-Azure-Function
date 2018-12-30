@@ -6,9 +6,13 @@ namespace FizzBuzz.Application
     public static class FizzBuzzGenerator
     {
         [FunctionName("Generate")]
-        public static string Generate([QueueTrigger("FizzBuzz-messages-001", Connection = "")]int number, ILogger log)
+        public static void Generate(
+            [QueueTrigger("fizzbuzz-messages-001")]string queueItem,
+            [Queue("fizzbuzz-messages-002")] out string result,
+            ILogger log)
         {
-            string result = string.Empty;
+            int number = int.Parse(queueItem);
+            result = string.Empty;
 
             if ((number % 3) == 0)
             {
@@ -20,8 +24,7 @@ namespace FizzBuzz.Application
                 result += "Buzz";
             }
 
-            log.LogInformation($"Item '{number}' is processed");
-            return result;
+            log.LogInformation($"Item '{number}' is processed");            
         }
     }
 }

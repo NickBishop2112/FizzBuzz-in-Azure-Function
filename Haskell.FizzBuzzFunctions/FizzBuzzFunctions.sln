@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FizzBuzz.Application", "Haskell.FizzBuzzFunctions\FizzBuzz.Application.csproj", "{E2ABE7FE-CCAC-4B54-A352-FDD61E4D3D60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FizzBuzz.Application", "Haskell.FizzBuzzFunctions\FizzBuzz.Application.csproj", "{E2ABE7FE-CCAC-4B54-A352-FDD61E4D3D60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FizzBuzz.Application.Tests", "Haskell.FizzBuzzFunctions.Tests\FizzBuzz.Application.Tests.csproj", "{68C50F75-CA07-4DA1-9B64-9FB9EAFA9A45}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FizzBuzz.Application.Tests", "Haskell.FizzBuzzFunctions.Tests\FizzBuzz.Application.Tests.csproj", "{68C50F75-CA07-4DA1-9B64-9FB9EAFA9A45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FizzBuzz.Client.Tests", "Haskell.FizzBuzz.Client.Tests\FizzBuzz.Client.Tests.csproj", "{4DC95D6E-BC8A-4157-8570-298F7AC3748F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FizzBuzz.Client.Tests", "Haskell.FizzBuzz.Client.Tests\FizzBuzz.Client.Tests.csproj", "{4DC95D6E-BC8A-4157-8570-298F7AC3748F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FizzBuzz.Client", "FizzBuzz.Client\FizzBuzz.Client.csproj", "{BF7EB8E7-F0AA-4359-87DA-38D28012BD07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FizzBuzz.Client", "FizzBuzz.Client\FizzBuzz.Client.csproj", "{BF7EB8E7-F0AA-4359-87DA-38D28012BD07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

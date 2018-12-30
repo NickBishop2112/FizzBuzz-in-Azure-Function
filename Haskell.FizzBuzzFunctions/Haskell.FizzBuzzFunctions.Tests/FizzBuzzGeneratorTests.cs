@@ -22,7 +22,8 @@ namespace FizzBuzz.Application.Tests
         [TestMethod]
         public void GivenGenerateWhenMultiplesOfThreeThenFizz()
         {
-            var result = FizzBuzzGenerator.Generate(3, this.logger.Object);
+            string result;
+            FizzBuzzGenerator.Generate("3", out result, this.logger.Object);
 
             result.Should().Be("Fizz");
             this.VerifyLogging("Item '3' is processed");
@@ -31,7 +32,8 @@ namespace FizzBuzz.Application.Tests
         [TestMethod]
         public void GivenGenerateWhenMultiplesOfFiveThenBuzz()
         {
-            var result = FizzBuzzGenerator.Generate(5, this.logger.Object);
+            string result;
+            FizzBuzzGenerator.Generate("5", out result, this.logger.Object);
             result.Should().Be("Buzz");
             this.VerifyLogging("Item '5' is processed");
         }
@@ -39,7 +41,8 @@ namespace FizzBuzz.Application.Tests
         [TestMethod]
         public void GivenGenerateWhenMultiplesOfThreeAndFiveThenFizzBuzz()
         {
-            var result = FizzBuzzGenerator.Generate(15, this.logger.Object);
+            string result;
+            FizzBuzzGenerator.Generate("15", out result, this.logger.Object);
             result.Should().Be("FizzBuzz");
             this.VerifyLogging("Item '15' is processed");
         }
@@ -47,7 +50,8 @@ namespace FizzBuzz.Application.Tests
         [TestMethod]
         public void GivenGenerateWhenNeitherMultiplesOfThreeOrFiveThenNoFizzAndOrBuzz()
         {
-            var result = FizzBuzzGenerator.Generate(1, this.logger.Object);
+            string result;
+            FizzBuzzGenerator.Generate("1", out result, this.logger.Object);
             result.Should().Be(string.Empty);
             this.VerifyLogging("Item '1' is processed");
         }

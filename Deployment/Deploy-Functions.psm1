@@ -392,4 +392,3 @@ function Remove-AzureQueue
         Write-Warning "Unable to remove the queue '$queueName' on storage account '$storageAccount' for resource group '$resourceGroupName' as it does not exist"        
     }
 }
-

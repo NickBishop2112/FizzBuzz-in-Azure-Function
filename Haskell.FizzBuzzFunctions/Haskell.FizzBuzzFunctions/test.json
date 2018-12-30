@@ -1,0 +1,92 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appService_FizzBuzzApplication20181228111356_name": {
+      "type": "string"
+    },
+    "appServicePlan_FizzBuzzApplication20181228111356Plan_location": {
+      "type": "string"
+    },
+    "appServicePlan_FizzBuzzApplication20181228111356Plan_name": {
+      "type": "string"
+    },
+    "appServicePlan_FizzBuzzApplication20181228111356Plan_resourceGroup": {
+      "type": "string"
+    },
+    "storageaccount_haskellfunctionstorage": {
+      "type": "string"
+    },
+    "appServicePlan_FizzBuzzApplication20181228111356Plan_skuName": {
+      "type": "string"
+    },
+    "appServicePlan_FizzBuzzApplication20181228111356Plan_skuTier": {
+      "type": "string"
+    },
+    "appServicePlan_FizzBuzzApplication20181228111356Plan_skuFamily": {
+      "type": "string"
+    },
+    "appServicePlan_FizzBuzzApplication20181228111356Plan_skuSize": {
+      "type": "string"
+    },
+    "appServicePlan_FizzBuzzApplication20181228111356Plan_workerSizeId": {
+      "type": "int"
+    }
+  },
+  "resources": [
+    {
+      "location": "[parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_location')]",
+      "name": "[parameters('appService_FizzBuzzApplication20181228111356_name')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2015-08-01",
+      "tags": {
+        "[concat('hidden-related:', resourceId(parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_resourceGroup'),'Microsoft.Web/serverfarms', parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_name')))]": "empty"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverFarms', parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_name'))]"
+      ],
+      "kind": "functionapp",
+      "properties": {
+        "name": "[parameters('appService_FizzBuzzApplication20181228111356_name')]",
+        "serverFarmId": "[resourceId(parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_resourceGroup'),'Microsoft.Web/serverfarms', parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_name'))]",
+        "kind": "functionapp",
+        "httpsOnly": true
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "resources": [
+        {
+          "name": "appsettings",
+          "type": "config",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[concat('Microsoft.Web/Sites/', parameters('appService_FizzBuzzApplication20181228111356_name'))]"
+          ],
+          "properties": {
+            "FUNCTIONS_EXTENSION_VERSION": "~1",
+            "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageaccount_haskellfunctionstorage'), ';AccountKey=', listKeys(resourceId('haskellFunctions-dev-rg','Microsoft.Storage/storageAccounts', parameters('storageaccount_haskellfunctionstorage')), '2015-06-15').key1)]",
+            "WEBSITE_CONTENTSHARE": "[toLower(parameters('appService_FizzBuzzApplication20181228111356_name'))]",
+            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageaccount_haskellfunctionstorage'), ';AccountKey=', listKeys(resourceId('haskellFunctions-dev-rg','Microsoft.Storage/storageAccounts', parameters('storageaccount_haskellfunctionstorage')), '2015-06-15').key1)]",
+            "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageaccount_haskellfunctionstorage'), ';AccountKey=', listKeys(resourceId('haskellFunctions-dev-rg','Microsoft.Storage/storageAccounts', parameters('storageaccount_haskellfunctionstorage')), '2015-06-15').key1)]"
+          }
+        }
+      ]
+    },
+    {
+      "location": "[parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_location')]",
+      "name": "[parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_name')]",
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2015-08-01",
+      "sku": {
+        "name": "[parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_skuName')]",
+        "tier": "[parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_skuTier')]",
+        "family": "[parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_skuFamily')]",
+        "size": "[parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_skuSize')]"
+      },
+      "properties": {
+        "name": "[parameters('appServicePlan_FizzBuzzApplication20181228111356Plan_name')]"
+      }
+    }
+  ]
+}
