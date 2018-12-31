@@ -3,7 +3,7 @@
     using System;
     using System.IO;
 
-    public class FizzBuzzClient
+    public class FizzBuzzClient : IFizzBuzzClient
     {
         private TextWriter textWriter;
         private readonly IQueue queue;
@@ -18,7 +18,7 @@
         {
             this.queue.WriteAsync("3");
             var result = this.queue.ReadAsync();
-            this.textWriter.WriteLineAsync($"Number '3' is {result}");
+            this.textWriter.WriteLineAsync($"Number '3' is {result.Result}");
         }
     }
 }

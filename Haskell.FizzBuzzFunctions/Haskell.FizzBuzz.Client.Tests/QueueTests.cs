@@ -16,11 +16,14 @@
 
         private Mock<CloudQueue> cloudQueue;
 
+        private Queue queue;
+
         [TestInitialize]
         public void TestInitialise()
         {
             this.cloudQueueClient = new Mock<CloudQueueClient>(MockBehavior.Loose, new Uri("http://test"), new StorageCredentials());
             this.cloudQueue = new Mock<CloudQueue>(MockBehavior.Loose, new Uri("http://test"));
+            this.queue = new Queue(this.cloudQueueClient.Object, "inputQueueName", "outputQueueName");
         }
 
         [TestMethod]
@@ -31,7 +34,7 @@
                 .Returns(this.cloudQueue.Object);
 
             // Act
-            await new Queue("inputQueueName", this.cloudQueueClient.Object, "outputQueueName").WriteAsync("3");
+            await queue.WriteAsync("3");
 
             // Assert
             this.cloudQueue.Verify(x => x.AddMessageAsync(It.IsAny<CloudQueueMessage>()), Times.Once);
@@ -48,7 +51,7 @@
                 .ReturnsAsync(new CloudQueueMessage("Fizz"));
 
             // Act
-            var result = await new Queue("inputQueueName", this.cloudQueueClient.Object, "outputQueueName").ReadAsync();
+            var result = await new Queue(this.cloudQueueClient.Object, "inputQueueName", "outputQueueName").ReadAsync();
 
             // Assert
             result.Should().Be("Fizz");            

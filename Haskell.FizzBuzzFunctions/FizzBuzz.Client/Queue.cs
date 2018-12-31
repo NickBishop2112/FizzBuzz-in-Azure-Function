@@ -12,7 +12,7 @@
 
         private readonly string outputQueueName;
 
-        public Queue(string inputQueueName, CloudQueueClient cloudQueueClient, string outputQueueName)
+        public Queue(CloudQueueClient cloudQueueClient, string inputQueueName, string outputQueueName)
         {
             this.inputQueueName = inputQueueName;
             this.outputQueueName = outputQueueName;
@@ -21,9 +21,8 @@
 
         public async Task<string> ReadAsync()
         {
-            var queue = this.cloudQueueClient.GetQueueReference(this.inputQueueName);
-            CloudQueueMessage xxx = await queue.GetMessageAsync();
-            return xxx.AsString;
+            var queue = this.cloudQueueClient.GetQueueReference(this.outputQueueName);
+            return (await queue.GetMessageAsync()).AsString;
         }
 
         public async Task WriteAsync(string content)
