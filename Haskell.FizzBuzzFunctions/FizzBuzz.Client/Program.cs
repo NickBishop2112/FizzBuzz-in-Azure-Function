@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace FizzBuzz.Client
+﻿namespace FizzBuzz.Client
 {
+    using System;
+
     class Program
     {
         static void Main(string[] args)
