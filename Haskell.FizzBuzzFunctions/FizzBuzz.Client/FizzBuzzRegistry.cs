@@ -1,5 +1,6 @@
 ﻿namespace FizzBuzz.Client
 {
+    using Microsoft.Extensions.Configuration;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Queue;
     using StructureMap;
@@ -8,8 +9,8 @@
 
     public class FizzBuzzRegistry : Registry
     {
-        public FizzBuzzRegistry(Microsoft.Extensions.Configuration.IConfiguration configuration)
-        {
+        public FizzBuzzRegistry(IConfiguration configuration)
+        {            
             this.For<IQueue>()
                 .Use<Queue>()
                 .Ctor<CloudQueueClient>()

@@ -7,10 +7,12 @@
     class Program
     {
         static void Main(string[] args)
-        {          
-            IConfiguration configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .Build();
+        {
+            var configuration =
+                new ConfigurationBuilder()
+                  .AddJsonFile("appsettings.json", true, true)
+                  .AddUserSecrets<Program>()
+                  .Build();
 
             var container = new Container();
             container.Configure(context =>
