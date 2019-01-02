@@ -14,11 +14,14 @@
             this.queue = queue;
         }
 
-        public void Show()
+        public void Show(int minimum, int maximum)
         {
-            this.queue.WriteAsync("3");
-            var result = this.queue.ReadAsync();
-            this.textWriter.WriteLineAsync($"Number '3' is {result.Result}");
+            for (int index = minimum; index < (maximum + 1);  index++)
+            {
+                this.queue.WriteAsync(index.ToString());
+                var result = this.queue.ReadAsync();
+                this.textWriter.WriteLineAsync($"Requested Number is '{index}' and is '{result.Result}'");
+            }            
         }
     }
 }

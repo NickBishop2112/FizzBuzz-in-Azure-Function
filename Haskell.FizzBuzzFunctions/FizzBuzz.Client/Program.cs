@@ -20,7 +20,7 @@
                 context.AddRegistry(new FizzBuzzRegistry(configuration));                
             });
 
-            container.GetInstance<IFizzBuzzClient>().Show();
+            container.GetInstance<IFizzBuzzClient>().Show(1, 20);
             Console.ReadKey();
         }
     }

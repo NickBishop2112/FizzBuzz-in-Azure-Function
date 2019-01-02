@@ -2,6 +2,6 @@
 {
     public interface IFizzBuzzClient
     {
-        void Show();
+        void Show(int minimum, int maximum);
     }
 }
