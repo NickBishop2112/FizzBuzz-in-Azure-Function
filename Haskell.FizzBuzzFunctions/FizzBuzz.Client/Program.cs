@@ -1,15 +1,19 @@
 ﻿namespace FizzBuzz.Client
 {
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Configuration.CommandLine;
     using StructureMap;
     using System;
+    using System.IO;
 
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var configuration =
                 new ConfigurationBuilder()
+                  .SetBasePath(Directory.GetCurrentDirectory())
+                  .AddCommandLine(args)
                   .AddJsonFile("appsettings.json", true, true)
                   .AddUserSecrets<Program>()
                   .Build();
@@ -19,9 +23,8 @@
             {
                 context.AddRegistry(new FizzBuzzRegistry(configuration));                
             });
-
-            container.GetInstance<IFizzBuzzClient>().Show(1, 20);
-            Console.ReadKey();
+                        
+            container.GetInstance<IFizzBuzzClient>().Show(configuration.GetValue<int>("min"), configuration.GetValue<int>("max"));            
         }
     }
 }

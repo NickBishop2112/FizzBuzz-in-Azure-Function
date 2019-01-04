@@ -18,6 +18,7 @@
         {
             for (int index = minimum; index < (maximum + 1);  index++)
             {
+                this.textWriter.WriteLineAsync($"Sent Number is '{index}'");
                 this.queue.WriteAsync(index.ToString());
                 var result = this.queue.ReadAsync();
                 this.textWriter.WriteLineAsync($"Requested Number is '{index}' and is '{result.Result}'");

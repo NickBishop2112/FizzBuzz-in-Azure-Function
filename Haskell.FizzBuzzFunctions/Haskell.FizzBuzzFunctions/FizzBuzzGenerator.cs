@@ -32,7 +32,7 @@ namespace FizzBuzz.Application
                     result += "Buzz";
                 }
 
-                log.LogInformation($"Item '{number}' is processed");
+                log.LogInformation($"Queue Item '{queueItem}', Item '{number}' with result of '{result}' has been processed.");
                 return result;
             }
             catch (Exception exception)

@@ -53,6 +53,14 @@ namespace FizzBuzz.Application.Tests
         }
 
         [TestMethod]
+        public void GivenGenerateWhenTwoThenNoFizzAndOrBuzz()
+        {
+            string result = FizzBuzzGenerator.Generate("2", this.logger.Object);
+            result.Should().Be(string.Empty);
+            this.VerifyLogging("Item '2' is processed", LogLevel.Information);
+        }
+
+        [TestMethod]
         public void GivenGenerateWhenInvalidNumberThenHandleException()
         {
             Action action = () => FizzBuzzGenerator.Generate("x", this.logger.Object);
