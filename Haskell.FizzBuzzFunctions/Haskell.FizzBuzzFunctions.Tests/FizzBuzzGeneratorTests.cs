@@ -7,6 +7,7 @@ namespace FizzBuzz.Application.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System;
+    using System.Collections.Generic;
 
     [TestClass]
     public class FizzBuzzGeneratorTests
@@ -22,44 +23,36 @@ namespace FizzBuzz.Application.Tests
         [TestMethod]
         public void GivenGenerateWhenMultiplesOfThreeThenFizz()
         {
-            string result = FizzBuzzGenerator.Generate("3", this.logger.Object);
+            var result = FizzBuzzGenerator.Generate("3", this.logger.Object);
 
-            result.Should().Be("Fizz");
-            this.VerifyLogging("Item '3' is processed", LogLevel.Information);
+            result.Should().Be(new KeyValuePair<string, string>("3", "Fizz"));
+            this.VerifyLogging("Queue Item '3', Item '3' with result of 'Fizz' has been processed.", LogLevel.Information);
         }
 
         [TestMethod]
         public void GivenGenerateWhenMultiplesOfFiveThenBuzz()
         {
-            string result = FizzBuzzGenerator.Generate("5", this.logger.Object);
-            result.Should().Be("Buzz");
-            this.VerifyLogging("Item '5' is processed", LogLevel.Information);
+            var result = FizzBuzzGenerator.Generate("5", this.logger.Object);
+            result.Should().Be(new KeyValuePair<string, string>("5", "Buzz"));
+            this.VerifyLogging("Queue Item '5', Item '5' with result of 'Buzz' has been processed.", LogLevel.Information);
         }
 
         [TestMethod]
         public void GivenGenerateWhenMultiplesOfThreeAndFiveThenFizzBuzz()
         {
-            string result = FizzBuzzGenerator.Generate("15", this.logger.Object);
-            result.Should().Be("FizzBuzz");
-            this.VerifyLogging("Item '15' is processed", LogLevel.Information);
+            var result = FizzBuzzGenerator.Generate("15", this.logger.Object);
+            result.Should().Be(new KeyValuePair<string, string>("15", "FizzBuzz"));
+            this.VerifyLogging("Queue Item '15', Item '15' with result of 'FizzBuzz' has been processed.", LogLevel.Information);
         }
 
         [TestMethod]
         public void GivenGenerateWhenNeitherMultiplesOfThreeOrFiveThenNoFizzAndOrBuzz()
         {
-            string result = FizzBuzzGenerator.Generate("1", this.logger.Object);
-            result.Should().Be(string.Empty);
-            this.VerifyLogging("Item '1' is processed", LogLevel.Information);
+            var result = FizzBuzzGenerator.Generate("1", this.logger.Object);
+            result.Should().Be(new KeyValuePair<string, string>("1", string.Empty));
+            this.VerifyLogging("Queue Item '1', Item '1' with result of '' has been processed.", LogLevel.Information);
         }
-
-        [TestMethod]
-        public void GivenGenerateWhenTwoThenNoFizzAndOrBuzz()
-        {
-            string result = FizzBuzzGenerator.Generate("2", this.logger.Object);
-            result.Should().Be(string.Empty);
-            this.VerifyLogging("Item '2' is processed", LogLevel.Information);
-        }
-
+      
         [TestMethod]
         public void GivenGenerateWhenInvalidNumberThenHandleException()
         {

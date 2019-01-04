@@ -29,9 +29,12 @@ namespace FizzBuzz.Client.Tests
             }
 
             queue.SetupSequence(x => x.ReadAsync())
-                .ReturnsAsync(string.Empty)
-                .ReturnsAsync(string.Empty)
-                .ReturnsAsync("Fizz");
+                .ReturnsAsync(new Dictionary<string, string>
+                {
+                    ["1"] = string.Empty,
+                    ["2"] = string.Empty,
+                    ["3"] = "Fizz"
+                });
 
             // Act
             new FizzBuzzClient(textWriter.Object, queue.Object).Show(1,3);

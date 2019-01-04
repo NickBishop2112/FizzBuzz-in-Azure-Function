@@ -12,14 +12,14 @@
         public void GivenMainWhenCalledThenFizzBuzz()
         {
             // Arrange
-            var sw = new StringWriter();
-            Console.SetOut(sw);
+            var stringBuilder = new StringWriter();
+            Console.SetOut(stringBuilder);
 
             // Act
-            Program.Main(new string[] { "--min=2", "--max=2" });
+            Program.Main(new string[] { "--min=1", "--max=3" });
 
             // Assert
-            sw.ToString().Should().Be("Sent Number is '1'\r\nRequested Number is '1' and is ''\r\n");
+            stringBuilder.ToString().Should().Be("Sent Number is '1'\r\nRequested Number is '1' and is ''\r\n");
         }
     }
 }

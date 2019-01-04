@@ -3,12 +3,13 @@ namespace FizzBuzz.Application
     using Microsoft.Azure.WebJobs;
     using Microsoft.Extensions.Logging;
     using System;
+    using System.Collections.Generic;
 
     public static class FizzBuzzGenerator
     {
         [FunctionName("Generate")]
         [return: Queue("fizzbuzz-messages-002")]
-        public static string Generate(
+        public static KeyValuePair<string, string> Generate(
             [QueueTrigger("fizzbuzz-messages-001")]string queueItem,
             ILogger log)
         {
@@ -33,7 +34,7 @@ namespace FizzBuzz.Application
                 }
 
                 log.LogInformation($"Queue Item '{queueItem}', Item '{number}' with result of '{result}' has been processed.");
-                return result;
+                return new KeyValuePair<string, string>(queueItem, result);
             }
             catch (Exception exception)
             {

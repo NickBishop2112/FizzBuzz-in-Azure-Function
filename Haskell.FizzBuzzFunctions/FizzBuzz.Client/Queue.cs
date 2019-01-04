@@ -1,7 +1,11 @@
 ﻿namespace FizzBuzz.Client
 {
     using Microsoft.WindowsAzure.Storage.Queue;
+    using Newtonsoft.Json;
+    using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Runtime.Serialization.Formatters.Binary;
     using System.Threading.Tasks;
 
     public class Queue : IQueue
@@ -19,10 +23,14 @@
             this.cloudQueueClient = cloudQueueClient;
         }
 
-        public async Task<string> ReadAsync()
+        public async Task<IDictionary<string, string>> ReadAsync()
         {
             var queue = this.cloudQueueClient.GetQueueReference(this.outputQueueName);
-            return (await queue.GetMessageAsync()).AsString;
+            IEnumerable<CloudQueueMessage> messages = await queue.GetMessagesAsync(5);
+
+            return messages
+                .Select(message => JsonConvert.DeserializeObject<KeyValuePair<string, string>>(message.AsString))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);            
         }
 
         public async Task WriteAsync(string content)
