@@ -27,9 +27,9 @@
             using (var container = GetContainer(MockConfiguration()))
             {
                 container
-                    .GetInstance<IQueue>()
+                    .GetInstance<IQueueHandler>()
                     .Should()
-                    .BeOfType<Queue>();
+                    .BeOfType<QueueHandler>();
             }
         }
 

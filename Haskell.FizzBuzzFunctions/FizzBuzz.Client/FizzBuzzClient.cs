@@ -1,42 +1,95 @@
 ﻿namespace FizzBuzz.Client
 {
+    using Microsoft.Extensions.Configuration;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public class FizzBuzzClient : IFizzBuzzClient
     {
         private TextWriter textWriter;
-        private readonly IQueue queue;
+        private readonly IQueueHandler queueHandler;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration configuration;
 
-        public FizzBuzzClient(TextWriter textWriter, IQueue queue)
+        public FizzBuzzClient(
+            TextWriter textWriter, 
+            IQueueHandler queueHandler, 
+            Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             this.textWriter = textWriter;
-            this.queue = queue;
+            this.queueHandler = queueHandler;
+            this.configuration = configuration;
         }
 
-        public void Show(int minimum, int maximum)
+        public void ShowAsync(int minimum, int maximum)
+        {
+            this.queueHandler.ClearAsync();
+
+            var slots = new Dictionary<string, bool>();
+
+            async Task WriteAsync()
+            {
+                for (int index = minimum; index < (maximum + 1); index++)
+                {
+                    await this.textWriter.WriteLineAsync($"Sent Number is '{index}'").ConfigureAwait(false);
+                    await this.queueHandler.WriteAsync(index.ToString());
+                    slots.Add(index.ToString(), false);
+                }
+            };
+
+            async Task ReadAsync()
+            {
+                while (!slots.Any() || slots.Values.Any(isProcessed => !isProcessed))
+                {
+                    var result = this.queueHandler.ReadAsync();
+                    foreach (var response in result.Result)
+                    {
+                        await this.textWriter.WriteLineAsync($"Requested Number is '{response.Key}' and is '{response.Value}'");
+                        slots[response.Key] = true;
+                    }
+                }
+
+                await Task.Delay(this.configuration.GetValue<int>("Delay")).ConfigureAwait(false);
+            };
+       
+            Task.WaitAll(WriteAsync(),ReadAsync());
+        }
+
+        public void ShowAsyncOld(int minimum, int maximum)
         {
             var slots = new Dictionary<string, bool>();
 
-            for (int index = minimum; index < (maximum + 1); index++)
+            var x = new Task(() =>
             {
-                this.textWriter.WriteLineAsync($"Sent Number is '{index}'");
-                this.queue.WriteAsync(index.ToString());
-                slots.Add(index.ToString(), false);
-
-            }
-
-            while (slots.Values.Any(isProcessed => !isProcessed))
-            {
-                var result = this.queue.ReadAsync();
-                foreach (var response in result.Result)
+                for (int index = minimum; index < (maximum + 1); index++)
                 {
-                    this.textWriter.WriteLineAsync($"Requested Number is '{response.Key}' and is '{response.Value}'");
-                    slots[response.Key] = true;
-                }            
-            }
+                    this.textWriter.WriteLineAsync($"Sent Number is '{index}'");
+                    this.queueHandler.WriteAsync(index.ToString());
+                    slots.Add(index.ToString(), false);
+                }
+            });
+
+            var y = new Task(() =>
+            {
+                while (true) // slots.Values.Any(isProcessed => !isProcessed))
+                {
+                    var result = this.queueHandler.ReadAsync();
+                    foreach (var response in result.Result)
+                    {
+                        this.textWriter.WriteLineAsync($"Requested Number is '{response.Key}' and is '{response.Value}'");
+                        slots[response.Key] = true;
+                    }
+                }
+            });
+
+            x.ConfigureAwait(false);
+            x.Start();
+
+            y.ConfigureAwait(false);
+            y.Start();
+            Task.WaitAll(x, y);
         }
     }
 }

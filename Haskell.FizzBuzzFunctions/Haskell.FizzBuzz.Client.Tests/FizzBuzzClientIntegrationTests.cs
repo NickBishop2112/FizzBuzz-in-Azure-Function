@@ -9,17 +9,18 @@
     public class FizzBuzzClientIntegrationTests
     {
         [TestMethod]
-        public void GivenMainWhenCalledThenFizzBuzz()
+        public void GivenRunWhenCalledThenFizzBuzzForRangeOfNumbers()
         {
             // Arrange
             var stringBuilder = new StringWriter();
             Console.SetOut(stringBuilder);
 
             // Act
-            Program.Main(new string[] { "--min=1", "--max=3" });
+            Action action = () => Program.Main(new string[] { "--min=1", "--max=15" });
 
             // Assert
-            stringBuilder.ToString().Should().Be("Sent Number is '1'\r\nRequested Number is '1' and is ''\r\n");
+            action.Should().NotThrow<Exception>();
+            stringBuilder.ToString().Should().NotBeEmpty();
         }
     }
 }

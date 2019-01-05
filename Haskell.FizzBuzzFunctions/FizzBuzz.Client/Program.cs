@@ -24,7 +24,7 @@
                 context.AddRegistry(new FizzBuzzRegistry(configuration));                
             });
                         
-            container.GetInstance<IFizzBuzzClient>().Show(configuration.GetValue<int>("min"), configuration.GetValue<int>("max"));            
+            container.GetInstance<IFizzBuzzClient>().ShowAsync(configuration.GetValue<int>("min"), configuration.GetValue<int>("max"));            
         }
     }
 }

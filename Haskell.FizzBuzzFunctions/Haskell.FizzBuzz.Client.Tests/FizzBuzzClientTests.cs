@@ -1,10 +1,12 @@
 namespace FizzBuzz.Client.Tests
 {
+    using Microsoft.Extensions.Configuration;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Threading.Tasks;
 
     [TestClass]
     public class FizzBuzzClientTests
@@ -14,7 +16,8 @@ namespace FizzBuzz.Client.Tests
         {
             // Arrange
             var textWriter = new Mock<TextWriter>();
-            var queue = new Mock<IQueue>();
+            var queue = new Mock<IQueueHandler>();
+            var configuration = new Mock<IConfiguration>(MockBehavior.Loose);
 
             var numbers = new List<Tuple<int, string>>
             {
@@ -25,7 +28,8 @@ namespace FizzBuzz.Client.Tests
 
             foreach (var number in numbers)
             {
-                queue.Setup(x => x.WriteAsync(number.Item1.ToString()));
+                queue.Setup(x => x.WriteAsync(number.Item1.ToString()))
+                    .Returns(Task.CompletedTask);
             }
 
             queue.SetupSequence(x => x.ReadAsync())
@@ -35,13 +39,16 @@ namespace FizzBuzz.Client.Tests
                     ["2"] = string.Empty,
                     ["3"] = "Fizz"
                 });
+            var configurationSection = new Mock<IConfigurationSection>();
+            configurationSection.Setup(x => x.Value).Returns("10");
+            configuration.Setup(x => x.GetSection("Delay")).Returns(configurationSection.Object);
 
             // Act
-            new FizzBuzzClient(textWriter.Object, queue.Object).Show(1,3);
+            new FizzBuzzClient(textWriter.Object, queue.Object, configuration.Object).ShowAsync(1,3);
 
             // Assert
             queue.VerifyAll();
-
+            queue.Verify(x => x.ClearAsync(), Times.Once);
             numbers.ForEach(x => textWriter.Verify(y => y.WriteLineAsync(x.Item2), Times.Once()));
             
        }

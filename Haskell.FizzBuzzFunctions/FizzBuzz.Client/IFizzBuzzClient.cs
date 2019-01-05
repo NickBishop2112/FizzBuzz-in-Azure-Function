@@ -1,7 +1,9 @@
 ﻿namespace FizzBuzz.Client
 {
+    using System.Threading.Tasks;
+
     public interface IFizzBuzzClient
     {
-        void Show(int minimum, int maximum);
+        void ShowAsync(int minimum, int maximum);
     }
 }

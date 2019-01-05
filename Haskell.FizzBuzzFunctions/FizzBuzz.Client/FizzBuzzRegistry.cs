@@ -11,8 +11,8 @@
     {
         public FizzBuzzRegistry(IConfiguration configuration)
         {            
-            this.For<IQueue>()
-                .Use<Queue>()
+            this.For<IQueueHandler>()
+                .Use<QueueHandler>()
                 .Ctor<CloudQueueClient>()
                 .Is(() => CloudStorageAccount.Parse(configuration["Connection"]).CreateCloudQueueClient())
                 .Ctor<string>("inputQueueName").Is(configuration["InputQueueName"])
@@ -21,7 +21,9 @@
             this.For<IFizzBuzzClient>()
                 .Use<FizzBuzzClient>()
                 .Ctor<TextWriter>()
-                .Is(() => Console.Out);
+                .Is(() => Console.Out)
+                .Ctor<IConfiguration>()
+                .Is(configuration);
         }
     }
 }

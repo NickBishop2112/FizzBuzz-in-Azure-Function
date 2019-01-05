@@ -3,10 +3,11 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface IQueue
+    public interface IQueueHandler
     {
         Task WriteAsync(string v);
 
         Task<IDictionary<string, string>> ReadAsync();
+        Task ClearAsync();
     }
 }
