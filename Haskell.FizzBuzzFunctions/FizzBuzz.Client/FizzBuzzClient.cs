@@ -11,24 +11,24 @@
     {
         private TextWriter textWriter;
         private readonly IQueueHandler queueHandler;
-        private readonly Microsoft.Extensions.Configuration.IConfiguration configuration;
+        private readonly IConfiguration configuration;
 
         public FizzBuzzClient(
             TextWriter textWriter, 
-            IQueueHandler queueHandler, 
-            Microsoft.Extensions.Configuration.IConfiguration configuration)
+            IQueueHandler queueHandler,
+            IConfiguration configuration)
         {
             this.textWriter = textWriter;
             this.queueHandler = queueHandler;
             this.configuration = configuration;
         }
 
-        public void ShowAsync(int minimum, int maximum)
+        public async Task ShowAsync(int minimum, int maximum)
         {
-            Task.Run(() => this.queueHandler.ClearAsync());
-
+            await this.queueHandler.ClearAsync();
+            
             var slots = new Dictionary<string, bool>();
-
+            
             async Task WriteAsync()
             {
                 for (int index = minimum; index < (maximum + 1); index++)
@@ -44,18 +44,17 @@
             {
                 while (!slots.Any() || slots.Values.Any(isProcessed => !isProcessed))
                 {
-                    var result = this.queueHandler.ReadAsync();
-                    foreach (var response in result.Result)
+                    var result = await this.queueHandler.ReadAsync();
+                    foreach (var response in result)
                     {
                         await this.textWriter.WriteLineAsync($"Requested Number is '{response.Key}' and is '{response.Value}'");
                         slots[response.Key] = true;
                     }
                 }
-
-                await Task.Delay(this.configuration.GetValue<int>("Delay")).ConfigureAwait(false);
+                
             }
        
-            Task.WaitAll(WriteAsync(),ReadAsync());
+            await Task.WhenAll(WriteAsync(), ReadAsync());
         }
     }
 }

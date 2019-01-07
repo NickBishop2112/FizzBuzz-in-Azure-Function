@@ -12,7 +12,7 @@ namespace FizzBuzz.Client.Tests
     public class FizzBuzzClientTests
     {
         [TestMethod]
-        public void GivenShowWhenNumberRangeSuppliedThenFizzOrBuzz()
+        public async Task GivenShowWhenNumberRangeSuppliedThenFizzOrBuzzAsync()
         {
             // Arrange
             var textWriter = new Mock<TextWriter>();
@@ -44,8 +44,10 @@ namespace FizzBuzz.Client.Tests
             configuration.Setup(x => x.GetSection("Delay")).Returns(configurationSection.Object);
 
             // Act
-            new FizzBuzzClient(textWriter.Object, queue.Object, configuration.Object).ShowAsync(1,3);
+            var client = new FizzBuzzClient(textWriter.Object, queue.Object, configuration.Object);
 
+            await client.ShowAsync(1, 3);
+            
             // Assert
             queue.VerifyAll();
             queue.Verify(x => x.ClearAsync(), Times.Once);

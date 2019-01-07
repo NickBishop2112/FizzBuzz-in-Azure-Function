@@ -8,6 +8,7 @@
         Task WriteAsync(string v);
 
         Task<IDictionary<string, string>> ReadAsync();
+
         Task ClearAsync();
     }
 }

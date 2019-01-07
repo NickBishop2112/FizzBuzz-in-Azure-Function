@@ -4,6 +4,6 @@
 
     public interface IFizzBuzzClient
     {
-        void ShowAsync(int minimum, int maximum);
+        Task ShowAsync(int minimum, int maximum);
     }
 }
