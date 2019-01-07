@@ -15,8 +15,7 @@ namespace FizzBuzz.Application
         {
             try
             {
-                int number;
-                if (!int.TryParse(queueItem, out number))
+                if (!int.TryParse(queueItem, out int number))
                 {
                     throw new InvalidOperationException($"Fizz Buzz input '{queueItem}' should be a integer");
                 }

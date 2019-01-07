@@ -9,7 +9,7 @@
 
     public class FizzBuzzClient : IFizzBuzzClient
     {
-        private TextWriter textWriter;
+        private readonly TextWriter textWriter;
         private readonly IQueueHandler queueHandler;
         private readonly IConfiguration configuration;
 
