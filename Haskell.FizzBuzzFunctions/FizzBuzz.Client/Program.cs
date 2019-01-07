@@ -1,9 +1,9 @@
 ﻿namespace FizzBuzz.Client
 {
-    using Microsoft.Extensions.Configuration;
-    using StructureMap;
     using System;
     using System.IO;
+    using Microsoft.Extensions.Configuration;
+    using StructureMap;
 
     public class Program
     {

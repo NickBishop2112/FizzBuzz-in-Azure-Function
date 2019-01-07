@@ -1,9 +1,9 @@
 ﻿namespace FizzBuzz.Client.Tests
 {
-    using FluentAssertions;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.IO;
+    using FluentAssertions;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class FizzBuzzClientIntegrationTests
@@ -33,7 +33,7 @@
             // Act
             Action action = () => Program.Main(new string[] { "--min=aaa", "--max=15" });
 
-            // Assert  
+            // Assert
             action.Should().NotThrow<Exception>();
             stringBuilder.ToString().Should().NotBeEmpty();
         }

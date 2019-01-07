@@ -1,11 +1,11 @@
 ﻿namespace FizzBuzz.Client
 {
-    using Microsoft.Extensions.Configuration;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
 
     public class FizzBuzzClient : IFizzBuzzClient
     {
@@ -14,7 +14,7 @@
         private readonly IConfiguration configuration;
 
         public FizzBuzzClient(
-            TextWriter textWriter, 
+            TextWriter textWriter,
             IQueueHandler queueHandler,
             IConfiguration configuration)
         {
@@ -26,9 +26,9 @@
         public async Task ShowAsync(int minimum, int maximum)
         {
             await this.queueHandler.ClearAsync();
-            
+
             var slots = new Dictionary<string, bool>();
-            
+
             async Task WriteAsync()
             {
                 for (int index = minimum; index < (maximum + 1); index++)
@@ -51,9 +51,8 @@
                         slots[response.Key] = true;
                     }
                 }
-                
             }
-       
+
             await Task.WhenAll(WriteAsync(), ReadAsync());
         }
     }

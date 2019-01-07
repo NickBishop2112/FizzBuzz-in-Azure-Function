@@ -1,9 +1,9 @@
 namespace FizzBuzz.Application
 {
-    using Microsoft.Azure.WebJobs;
-    using Microsoft.Extensions.Logging;
     using System;
     using System.Collections.Generic;
+    using Microsoft.Azure.WebJobs;
+    using Microsoft.Extensions.Logging;
 
     public static class FizzBuzzGenerator
     {

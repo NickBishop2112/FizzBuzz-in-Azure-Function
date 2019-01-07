@@ -1,11 +1,11 @@
 ﻿namespace FizzBuzz.Client
 {
-    using Microsoft.WindowsAzure.Storage.Queue;
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.WindowsAzure.Storage.Queue;
+    using Newtonsoft.Json;
 
     public class QueueHandler : IQueueHandler
     {
@@ -29,7 +29,7 @@
 
             return messages
                 .Select(message => JsonConvert.DeserializeObject<KeyValuePair<string, string>>(message.AsString))
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);            
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
         public async Task WriteAsync(string content)

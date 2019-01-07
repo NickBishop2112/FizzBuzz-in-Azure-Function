@@ -13,7 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FizzBuzz.Client", "FizzBuzz
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BBCF75F1-4505-44F5-8828-FCCB755D36F4}"
 	ProjectSection(SolutionItems) = preProject
-		RuleSet.ruleset = RuleSet.ruleset
+		CodeAnalysis.ruleset = CodeAnalysis.ruleset
+		StyleCodeAnalysis.ruleset = StyleCodeAnalysis.ruleset
 	EndProjectSection
 EndProject
 Global

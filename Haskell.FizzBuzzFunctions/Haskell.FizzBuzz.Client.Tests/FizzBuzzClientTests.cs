@@ -1,12 +1,12 @@
 namespace FizzBuzz.Client.Tests
 {
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
 
     [TestClass]
     public class FizzBuzzClientTests
@@ -47,12 +47,11 @@ namespace FizzBuzz.Client.Tests
             var client = new FizzBuzzClient(textWriter.Object, queue.Object, configuration.Object);
 
             await client.ShowAsync(1, 3);
-            
+
             // Assert
             queue.VerifyAll();
             queue.Verify(x => x.ClearAsync(), Times.Once);
             numbers.ForEach(x => textWriter.Verify(y => y.WriteLineAsync(x.Item2), Times.Once()));
-            
        }
     }
 }

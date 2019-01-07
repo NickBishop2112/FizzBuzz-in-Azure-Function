@@ -1,14 +1,14 @@
 ﻿namespace FizzBuzz.Client.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
     using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.WindowsAzure.Storage.Auth;
     using Microsoft.WindowsAzure.Storage.Queue;
     using Moq;
     using Newtonsoft.Json;
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
 
     [TestClass]
 
@@ -36,7 +36,7 @@
                 .Returns(this.cloudQueue.Object);
 
             // Act
-            await queueHandler.WriteAsync("3");
+            await this.queueHandler.WriteAsync("3");
 
             // Assert
             this.cloudQueue.Verify(x => x.AddMessageAsync(It.IsAny<CloudQueueMessage>()), Times.Once);

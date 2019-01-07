@@ -1,13 +1,13 @@
 namespace FizzBuzz.Application.Tests
 {
+    using System;
+    using System.Collections.Generic;
     using FizzBuzz.Application;
     using FluentAssertions;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Internal;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using System;
-    using System.Collections.Generic;
 
     [TestClass]
     public class FizzBuzzGeneratorTests
@@ -52,26 +52,26 @@ namespace FizzBuzz.Application.Tests
             result.Should().Be(new KeyValuePair<string, string>("1", string.Empty));
             this.VerifyLogging("Queue Item '1', Item '1' with result of '' has been processed.", LogLevel.Information);
         }
-      
+
         [TestMethod]
         public void GivenGenerateWhenInvalidNumberThenHandleException()
         {
             Action action = () => FizzBuzzGenerator.Generate("x", this.logger.Object);
-            action.Should().ThrowExactly<InvalidOperationException>().WithMessage("Fizz Buzz input 'x' should be a integer"); 
-            this.VerifyLogging("System.InvalidOperationException: Fizz Buzz input 'x' should be a integer", LogLevel.Error);            
+            action.Should().ThrowExactly<InvalidOperationException>().WithMessage("Fizz Buzz input 'x' should be a integer");
+            this.VerifyLogging("System.InvalidOperationException: Fizz Buzz input 'x' should be a integer", LogLevel.Error);
         }
 
         private void VerifyLogging(string message, LogLevel logLevel)
         {
             this.logger
                 .Verify(
-                    x => 
+                    x =>
                         x.Log(
-                            logLevel, 
-                            It.IsAny<EventId>(), 
-                            It.Is<FormattedLogValues>(y => y[0].Value.ToString().StartsWith(message, StringComparison.Ordinal)), 
-                            It.IsAny<Exception>(), 
-                            It.IsAny<Func<object, Exception, string>>()), 
+                            logLevel,
+                            It.IsAny<EventId>(),
+                            It.Is<FormattedLogValues>(y => y[0].Value.ToString().StartsWith(message, StringComparison.Ordinal)),
+                            It.IsAny<Exception>(),
+                            It.IsAny<Func<object, Exception, string>>()),
                     Times.Once);
         }
     }
